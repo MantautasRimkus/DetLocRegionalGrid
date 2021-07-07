@@ -15,6 +15,8 @@
 #In training_simulation2.csv, line 89 is the true faulted line.
 #Faults were applied at second 600.
 
+#Data range is from second 0 to second 660. 
+
 #Information about grids connections is needed to run the localization algorithm.  
 #For the regional grid described in the paper (WECC), information is stored in regional_grid.csv. 
 
@@ -32,9 +34,9 @@ library("tidyverse")
 regional_grid <- read.csv("regional_grid.csv")
 
 #To run code for training_simulation2.csv, change the code line below. 
-data_modulus <- vroom::vroom(file = "training_simulation2.csv")[,1:122] %>%
-  magrittr::set_colnames(paste("Bus", 1:122)) %>% 
-  as.matrix() 
+data_modulus <- (vroom::vroom(file = "training_simulation2.csv") %>%
+   magrittr::set_colnames(paste("Bus", 1:122)) %>%
+   as.matrix())[1:86400,1:122]
 
 #Make time grid (in seconds). In general, most of the data sets would have time variable. Just assign
 #it separately to the time_grid variable
