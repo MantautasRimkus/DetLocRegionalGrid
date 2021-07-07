@@ -1,15 +1,22 @@
-#Code provided provides algorithms described in [.......]
-#Author - Mantautas Rimkus, Colorado State University 
+#Code provides algorithms described in paper "Detection and Localization of 
+#Faults in a Regional Power Grid"
+
+#This repository provides the R code for the algorithms described in the paper "Detection and Localization of Faults in a Regional Power Grid". 
+
+#Code Author - Mantautas Rimkus, Colorado State University, mantautas.rimkus@colostate.edu
 
 #The code is organized following the chapters of the paper.
 
-#For an illustration of the code, one training simulation is provided (training_simulation.csv).
-#Provided .csv file follows the structure described in the paper, where each column represents
-#different buses (pmu) and each row - time starting at 0 with 120 per second rate. In this particular
-#data set, line 7 is the faulted one.
+#For an illustration of the code, two training simulations is provided (training_simulation1.csv and training_simulation2.csv).
 
-#For localization, information about grids connections is needed. For the regional grid
-#described in the paper, information is stored in graph.csv. 
+#Given .csv files follows the structure described in the paper, where each column represents different buses (pmus) and each row - observation starting at second 0 with 120 observations per second rate. 
+
+#In training_simulation1.csv, line 7 is the true faulted line.
+#In training_simulation2.csv, line 89 is the true faulted line.
+#Faults were applied at second 600.
+
+#Information about grids connections is needed to run the localization algorithm.  
+#For the regional grid described in the paper (WECC), information is stored in regional_grid.csv. 
 
 #------------------------------------------------------------------------------------------
 #Libraries
@@ -24,11 +31,12 @@ library("tidyverse")
 #Read files
 regional_grid <- read.csv("regional_grid.csv")
 
-data_modulus <- vroom::vroom(file = "training_simulation.csv")[,1:122] %>%
+#To run code for training_simulation2.csv, change the code line below. 
+data_modulus <- vroom::vroom(file = "training_simulation2.csv")[,1:122] %>%
   magrittr::set_colnames(paste("Bus", 1:122)) %>% 
   as.matrix() 
 
-#Make time grid (in seconds). In general, most of the datasets would have time variable. Just assign
+#Make time grid (in seconds). In general, most of the data sets would have time variable. Just assign
 #it separately to the time_grid variable
 max_time <- 900
 min_time <- 0 
@@ -171,10 +179,15 @@ if(length(B_prediction_start)==1) {
     }
   }
   
+  #Pasitikrinimui
+  savez <- c()
+  savez <- c(savez, m_t_vekt_current[B_prediction_start])
+  
   #Calculating D_star differences for possible end buses. 
   
   end_bus_prediction <-
-    names(which.max(m_t_vekt_current[B_prediction_start]-m_t_vekt_previous[B_prediction_start]))
+    names(which.max(abs(m_t_vekt_current[B_prediction_start]-xbar_t_vekt[B_prediction_start])-
+                      abs(m_t_vekt_previous[B_prediction_start]-xbar_t_vekt[B_prediction_start])))
 
 }
 
